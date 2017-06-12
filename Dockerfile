@@ -36,7 +36,7 @@ RUN  echo " ... adding Openresty, NGINX, NAXSI and PCRE" \
      && tar -zxf ./openresty-${OPENRESTY_VERSION}.tar.gz \
      && tar -zxf ./pcre-${PCRE_VERSION}.tar.gz \
      && tar -zxf ./naxsi-${NAXSI_VERSION}.tar.gz \
-     && cd /tmp/api-gateway/openresty-${OPENRESTY_VERSION} \ 
+     && cd /tmp/api-gateway/openresty-${OPENRESTY_VERSION} \
 
      && echo "        - building debugging version of the api-gateway ... " \
      && ./configure \
@@ -182,6 +182,15 @@ RUN echo " ... installing lua-resty-lrucache... " \
     && rm -rf /tmp/api-gateway
 
 
+ENV LUA_RESTY_JWT_VERSION 0.1.10
+RUN echo " ... installing lua-resty-jwt ... " \
+    && mkdir -p /tmp/api-gateway \
+    && curl -k -L https://github.com/SkyLothar/lua-resty-jwt/archive/v${LUA_RESTY_JWT_VERSION}.tar.gz -o /tmp/api-gateway/lua-resty-jwt-${LUA_RESTY_JWT_VERSION}.tar.gz \
+    && tar -xf /tmp/api-gateway/lua-resty-jwt-${LUA_RESTY_JWT_VERSION}.tar.gz -C /tmp/api-gateway/ \
+    && cd /tmp/api-gateway/lua-resty-jwt-${LUA_RESTY_JWT_VERSION} \
+    && export LUA_LIB_DIR=${_prefix}/api-gateway/lualib \
+    && cp -r lib/* $LUA_LIB_DIR \
+    && rm -rf /tmp/api-gateway
 
 ENV NETURL_LUA_VERSION 0.9-1
 RUN echo " ... installing neturl.lua ... " \
@@ -192,7 +201,6 @@ RUN echo " ... installing neturl.lua ... " \
     && cd /tmp/api-gateway/neturl-${NETURL_LUA_VERSION} \
     && cp lib/net/url.lua ${LUA_LIB_DIR} \
     && rm -rf /tmp/api-gateway
-
 
 RUN \
     curl -L -k -s -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
